@@ -1,4 +1,4 @@
-function Get-NkeSshCredentials {   
+function Get-NkeClusterUpgrade {   
 <#
 .SYNOPSIS
 Dynamically Generated API Function
@@ -24,9 +24,9 @@ Please be aware that all code samples provided here are unofficial in nature, ar
         [PSCredential]
         $Credential,
 
-        # Name of the NKE Cluster
-        [Parameter(Mandatory)]
-        $NkeClusterName,
+        # NKE Cluster UUID
+        [Parameter(Mandatory=$true)]
+        $Uuid,
 
         [Parameter(Mandatory=$false)]
         [switch]
@@ -48,7 +48,7 @@ Please be aware that all code samples provided here are unofficial in nature, ar
         #$body.add("BodyParam1",$BodyParam1)
 
         $iwrArgs = @{
-            Uri = "https://$($ComputerName):$($Port)/karbon/v1/k8s/clusters/$NkeClusterName/ssh"
+            Uri = "https://$($ComputerName):$($Port)/karbon/k8s/cluster/$Uuid/k8s_upgrade"
             Method = "get"
             ContentType = "application/json"
             ErrorVariable = "iwrError"
@@ -73,6 +73,7 @@ Please be aware that all code samples provided here are unofficial in nature, ar
         }
         
         try{
+            Write-Verbose -Message "Invoking API Call to $($iwrArgs.Uri)"
             $response = Invoke-WebRequest @iwrArgs
 
             if ($response.StatusCode -in 200..204) {

@@ -1,4 +1,4 @@
-function Get-KarbonNodePools {   
+function Get-NkeSshCredential {   
 <#
 .SYNOPSIS
 Dynamically Generated API Function
@@ -24,19 +24,13 @@ Please be aware that all code samples provided here are unofficial in nature, ar
         [PSCredential]
         $Credential,
 
-        # Karbon Cluster Name
+        # Name of the NKE Cluster
         [Parameter(Mandatory)]
-        [string]
-        $KarbonClusterName,
+        $NkeClusterName,
 
         [Parameter(Mandatory=$false)]
         [switch]
         $SkipCertificateCheck,
-
-        [Parameter()]
-        [ValidateSet("worker","master","etcd")]
-        [string]
-        $NodePoolType,
 
         # Port (Default is 9440)
         [Parameter(Mandatory=$false)]
@@ -54,7 +48,7 @@ Please be aware that all code samples provided here are unofficial in nature, ar
         #$body.add("BodyParam1",$BodyParam1)
 
         $iwrArgs = @{
-            Uri = "https://$($ComputerName):$($Port)/karbon/v1-alpha.1/k8s/clusters/$KarbonClusterName/node-pools"
+            Uri = "https://$($ComputerName):$($Port)/karbon/v1/k8s/clusters/$NkeClusterName/ssh"
             Method = "get"
             ContentType = "application/json"
             ErrorVariable = "iwrError"
@@ -83,9 +77,6 @@ Please be aware that all code samples provided here are unofficial in nature, ar
 
             if ($response.StatusCode -in 200..204) {
                 $content = $response.Content | ConvertFrom-Json
-                if ($NodePoolType) {
-                    $content = $content | Where-Object {$_.category -eq $NodePoolType}
-                }
                 $content
             }
         } 

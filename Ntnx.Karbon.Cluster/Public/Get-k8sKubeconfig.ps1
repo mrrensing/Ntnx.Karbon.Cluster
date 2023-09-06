@@ -89,7 +89,7 @@ Please be aware that all code samples provided here are unofficial in nature, ar
             }
 
             if (![string]::IsNullOrEmpty($KubeconfigOutPath)) {
-                $content.kube_config | Out-File -FilePath "$KubeconfigOutPath\$k8sName-kubectl.cfg"
+                $content.kube_config | Out-File -FilePath "$KubeconfigOutPath\$k8sName-kubectl.cfg" -NoNewline -Encoding utf8
             }
         } 
         catch{
