@@ -12,8 +12,8 @@ New-NtnxApiFunction -ApiSet karbon -ApiVer "v1-beta.1" -Method get -SubUrl "k8s/
 $functions = Get-ChildItem -Path $OutPath -Filter *.ps1 -Recurse
 
 foreach ($function in $functions) {
-    Get-Content -Path $function.FullName | Set-Content -Path $ModuleFile -Append
-    Write-Output "Export-ModuleMember $($function.BaseName)" | Set-Content -Path $ModuleFile -Append
+    Get-Content -Path $function.FullName | Add-Content -Path $ModuleFile 
+    Write-Output "Export-ModuleMember $($function.BaseName)" | Add-Content -Path $ModuleFile
     #$functionContent | Out-File -FilePath $function.FullName -Force
 }
 
