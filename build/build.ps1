@@ -6,14 +6,15 @@ New-NtnxApiFunction -ApiSet karbon -Method get -SubUrl "v1-alpha.1/k8s/clusters/
 New-NtnxApiFunction -ApiSet karbon -Method get -SubUrl "/karbon/v1/k8s/clusters/`$NkeClusterName/ssh" -AltNoun NkeSshCredential -Verbose
 New-NtnxApiFunction -ApiSet karbon -ApiVer "v1-beta.1" -Method get -SubUrl "k8s/clusters/{name}/available-updates" -AltNoun NkeAvailableUpdate -Verbose
 New-NtnxApiFunction -ApiSet karbon -ApiVer "v1-beta.1" -Method get -SubUrl "k8s/clusters" -AltNoun NkeCluster -Verbose
-New-NtnxApiFunction -ApiSet karbon -ApiVer "v1-beta.1" -Method get -SubUrl "k8s/cluster/{uuid}/k8s_upgrade" -AltNoun NkeClusterUpgrade -Verbose
+New-NtnxApiFunction -ApiSet karbon -ApiVer "v1-beta.1" -Method get -SubUrl "k8s/cluster/`$Uuid/k8s_upgrade" -AltNoun NkeClusterUpgrade -Verbose
 
 # for each function created, get content and write to module file
 $functions = Get-ChildItem -Path $OutPath -Filter *.ps1 -Recurse
 
 foreach ($function in $functions) {
-    Get-Content -Path $function.FullName | Set-Content -Path $mo
-    $functionContent | Out-File -FilePath $function.FullName -Force
+    Get-Content -Path $function.FullName | Set-Content -Path $ModuleFile -Append
+    Write-Output "Export-ModuleMember $($function.BaseName)" | Set-Content -Path $ModuleFile -Append
+    #$functionContent | Out-File -FilePath $function.FullName -Force
 }
 
 
