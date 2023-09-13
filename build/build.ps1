@@ -4,7 +4,7 @@ param(
     $ModuleFile = (Join-Path -Path $OutPath -ChildPath "$ModuleName.psd1")
 )
 
-$publicFunctionsPath = Join-Path -Path $OutPath -ChildPath "Public"
+$publicFunctionsPath = Join-Path -Path $OutPath -ChildPath $ModuleName -AdditionalChildPath "Public"
 
 
 # Create Module Manifest
