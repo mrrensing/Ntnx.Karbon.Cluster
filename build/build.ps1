@@ -1,19 +1,36 @@
-$OutPath = (Split-Path -path $PSScriptRoot)
-$ModuleName = (Split-Path -path $OutPath -Leaf)
-$ModuleFile = Join-Path -Path $OutPath -ChildPath "$ModuleName.psd1"
+param(
+    $OutPath = (Split-Path -path $PSScriptRoot),
+    $ModuleName = (Split-Path -path $OutPath -Leaf),
+    $ModuleFile = (Join-Path -Path $OutPath -ChildPath "$ModuleName.psd1")
+)
 
-New-NtnxApiFunction -ApiSet karbon -Method get -SubUrl "v1-alpha.1/k8s/clusters/`$KarbonName/node-pools" -AltNoun KarbonNodePool -Verbose
-New-NtnxApiFunction -ApiSet karbon -Method get -SubUrl "/karbon/v1/k8s/clusters/`$NkeClusterName/ssh" -AltNoun NkeSshCredential -Verbose
-New-NtnxApiFunction -ApiSet karbon -ApiVer "v1-beta.1" -Method get -SubUrl "k8s/clusters/{name}/available-updates" -AltNoun NkeAvailableUpdate -Verbose
-New-NtnxApiFunction -ApiSet karbon -ApiVer "v1-beta.1" -Method get -SubUrl "k8s/clusters" -AltNoun NkeCluster -Verbose
-New-NtnxApiFunction -ApiSet karbon -ApiVer "v1-beta.1" -Method get -SubUrl "k8s/cluster/`$Uuid/k8s_upgrade" -AltNoun NkeClusterUpgrade -Verbose
+$publicFunctionsPath = Join-Path -Path $OutPath -ChildPath "Public"
+
+
+# Create Module Manifest
+#New-ModuleManifest
+
+# Create Module File
+New-Item -Path $ModuleFile -ItemType File -Force
+
+$funcArgs = @{
+    OutPath = $publicFunctionsPath
+    ApiSet = "karbon"
+    Verbose = $true
+}
+
+New-NtnxApiFunction @funcArgs -ApiVer "v1-alpha.1"  -Method get -SubUrl "k8s/clusters/`$NkeClusterName/node-pools" -AltNoun NkeNodePool
+New-NtnxApiFunction @funcArgs -ApiVer "v1" -Method get -SubUrl "/karbon/v1/k8s/clusters/`$NkeClusterName/ssh" -AltNoun NkeSshCredential
+New-NtnxApiFunction @funcArgs -ApiVer "v1-beta.1" -Method get -SubUrl "k8s/clusters/`$Name/available-updates" -AltNoun NkeAvailableUpdate
+New-NtnxApiFunction @funcArgs -ApiVer "v1-beta.1" -Method get -SubUrl "k8s/clusters" -AltNoun NkeCluster
+New-NtnxApiFunction @funcArgs -ApiVer "v1-beta.1" -Method get -SubUrl "k8s/cluster/`$Uuid/k8s_upgrade" -AltNoun NkeClusterUpgrade
 
 # for each function created, get content and write to module file
-$functions = Get-ChildItem -Path $OutPath -Filter *.ps1 -Recurse
+$publicFunctions = Get-ChildItem -Path $publicFunctionsPath -Filter *.ps1 -Recurse
 
-foreach ($function in $functions) {
-    Get-Content -Path $function.FullName | Add-Content -Path $ModuleFile 
-    Write-Output "Export-ModuleMember $($function.BaseName)" | Add-Content -Path $ModuleFile
+foreach ($function in $publicFunctions) {
+    Get-Content -Path $function.FullName | Add-Content -Path $ModuleFile
+    Write-Output "`n Export-ModuleMember $($function.BaseName) `n" | Add-Content -Path $ModuleFile
     #$functionContent | Out-File -FilePath $function.FullName -Force
 }
 
